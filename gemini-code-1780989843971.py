@@ -28,8 +28,8 @@ if "mot_en_attente" not in st.session_state:
     st.session_state.mot_en_attente = None
 
 # ---- INTERFACE GRAPHIQUE (STREAMLIT) ----
-st.title("🤖 Le Chatbot Évolutif Collectif")
-st.write("Ce chatbot ne sait rien au départ. Parlez-lui en français pour construire sa mémoire !")
+st.title("The Royal Bot (the new)")
+st.write("This is a french chatbot. Apprenez lui ce que vous voulez !")
 
 # ---- BARRE LATÉRALE : CONDITIONS & ADMIN ----
 with st.sidebar:
@@ -58,8 +58,8 @@ with st.sidebar:
     st.subheader("🛠️ Zone Administrateur")
     mot_de_passe = st.text_input("Entrez le mot de passe admin :", type="password")
     
-    # REMPLACE "MimoSecurite2026" PAR LE MOT DE PASSE DE TON CHOIX
-    if mot_de_passe == "MimoSecurite2026":
+    # default password's: prk°~°
+    if mot_de_passe == "prk°~°":
         st.success("Accès Admin Autorisé")
         if st.button("🔴 Réinitialiser la mémoire"):
             memoire = {}
