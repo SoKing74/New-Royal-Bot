@@ -2,7 +2,6 @@ import streamlit as st
 import json
 import os
 
-# Nom du fichier qui stocke la mémoire sur le serveur
 FICHIER_MEMOIRE = "memoire_collective.json"
 
 def charger_memoire():
@@ -20,18 +19,15 @@ def sauvegarder_memoire(memoire_a_sauver):
     with open(FICHIER_MEMOIRE, "w", encoding="utf-8") as f:
         json.dump(memoire_a_sauver, f, ensure_ascii=False, indent=4)
 
-# Initialisation de la mémoire globale
+
 memoire = charger_memoire()
 
-# Variable temporaire pour se souvenir du mot que le bot cherche à apprendre
 if "mot_en_attente" not in st.session_state:
     st.session_state.mot_en_attente = None
 
-# ---- INTERFACE GRAPHIQUE (STREAMLIT) ----
 st.title("The Royal Bot (the new)")
 st.write("This is a french chatbot. Apprenez lui ce que vous voulez !")
 
-# ---- BARRE LATÉRALE : CONDITIONS & ADMIN ----
 with st.sidebar:
     st.header("⚖️ Conditions d'Utilisation")
     st.markdown("""
@@ -43,7 +39,6 @@ with st.sidebar:
     
     st.write("---")
     
-    # Bouton public pour voir l'état actuel de sa mémoire
     if st.button("🧠 Afficher les mots connus"):
         st.subheader("Mots dans ma base de données :")
         if memoire:
@@ -54,36 +49,31 @@ with st.sidebar:
 
     st.write("---")
     
-    # ZONE ADMIN SÉCURISÉE
     st.subheader("🛠️ Zone Administrateur")
     mot_de_passe = st.text_input("Entrez le mot de passe admin :", type="password")
     
-    # default password's: prk°~°
     if mot_de_passe == "prk°~°":
         st.success("Accès Admin Autorisé")
-        if st.button("🔴 Réinitialiser la mémoire"):
+        if st.button("💢reinitilation memorie's"):
             memoire = {}
             sauvegarder_memoire(memoire)
             st.session_state.mot_en_attente = None
             st.error("Mémoire entièrement vidée !")
             st.rerun()
 
-# ---- ZONE DE CHAT ----
 message_user = st.text_input("Écrivez votre message ici :", key="input_user")
 
 if message_user:
     message = message_user.lower().strip()
     reponse = ""
 
-    # Cas 1 : L'internaute donne la définition du mot que le bot attendait
     if st.session_state.mot_en_attente:
         mot_appris = st.session_state.mot_en_attente
         memoire[mot_appris] = message_user  # On garde les majuscules de l'utilisateur pour la définition
         sauvegarder_memoire(memoire)
-        reponse = f"Merci beaucoup ! J'ai enregistré : **{mot_appris}** signifie désormais *'{message_user}'* pour tout le monde."
+        reponse = f"Thank you ! J'ai enregistré : **{mot_appris}**. Du coup ca veur dire *'{message_user}'* pour tout le monde."
         st.session_state.mot_en_attente = None  # Réinitialisation de l'attente
 
-    # Cas 2 : Le bot cherche si un mot de la phrase est dans sa mémoire
     else:
         mots = message.split()
         trouve = False
@@ -91,11 +81,10 @@ if message_user:
             # Nettoyage rapide de la ponctuation autour du mot
             mot_nettoye = mot.strip(",.?!()\"'")
             if mot_nettoye in memoire:
-                reponse = f"Ah, je connais le mot **{mot_nettoye}** ! On m'a appris que c'est : *{memoire[mot_nettoye]}*"
+                reponse = f"Abrege je connais déjà **{mot_nettoye}** ! Tout le monde connais la deffinission : *{memoire[mot_nettoye]}*"
                 trouve = True
                 break
         
-        # Cas 3 : Le bot ne connaît aucun mot, il choisit le premier mot long pour demander une explication
         if not trouve:
             mots_interessants = [m.strip(",.?!()\"'") for m in mots if len(m.strip(",.?!()\"'")) > 3]
             if mots_interessants:
@@ -103,7 +92,6 @@ if message_user:
                 st.session_state.mot_en_attente = ce_mot
                 reponse = f"Je ne connais pas le mot **{ce_mot}**. Pouvez-vous m'expliquer ce que c'est ?"
             else:
-                reponse = "Je ne comprends aucun mot... Essayez de me parler avec des phrases plus longues !"
+                reponse = "Fais des vraix phrases sans abreger!"
 
-    # Affichage de la réponse à l'écran
     st.info(reponse)
